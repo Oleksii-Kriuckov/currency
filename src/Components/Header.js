@@ -15,6 +15,7 @@ const Header = () => {
         await axios.get('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json')
             .then((responce) => {
                 currencyRates(responce.data);
+                console.log(responce.data)
             })
             .catch((error) => {
                 console.error(error.toJSON().message)

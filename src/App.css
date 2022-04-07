@@ -2,14 +2,14 @@
   text-align: center;
 }
 
-#input, #select {
+#input {
   width: 90px;
   height: fit-content;
 }
 
-label {
-  line-height: 38px;
-}
+ #select {
+   width: fit-content;
+ }
 
 .rate {
   color: #eee;
