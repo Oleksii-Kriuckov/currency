@@ -1,10 +1,11 @@
 import React from 'react'
 
-const scoreboard = ({children, cc, ...props}) => {
+const scoreboard = ({ children, cc }) => { //Перейменувати сс
   return (
-    <div>
-        <span>{cc}</span>
-        <div>{children}</div>
+    <div className='d-flex'>
+      <span>1 {cc} = </span>
+      <div className='rate mx-2'>{children} </div>
+      <span>UAH</span>
     </div>
   )
 }

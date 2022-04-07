@@ -3,9 +3,17 @@
 }
 
 #input, #select {
-  width: 70px;
+  width: 90px;
+  height: fit-content;
 }
 
 label {
   line-height: 38px;
+}
+
+.rate {
+  color: #eee;
+  background-color: #000;
+  padding: 0 5px;
+  border-radius: 5px;
 }
