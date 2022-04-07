@@ -1,0 +1,1 @@
+export const initialCurrencyArray = ['USD', 'JPY', 'EUR', ]

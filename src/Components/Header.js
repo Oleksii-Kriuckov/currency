@@ -1,43 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import {arrayRateState} from '../Atoms/AtomArrayCurrency';
-import { usdRateState, eurRateState } from '../Atoms/atomCurrency';
+import {currencyArrayState} from '../Atoms/AtomArrayCurrency';
+// import { usdRateState, eurRateState } from '../Atoms/atomCurrency';
+import { initialCurrencyArray } from '../const';
 import { Navbar, Container } from 'react-bootstrap';
 import axios from 'axios';
 import Scoreboard from './Scoreboard';
 
 const Header = () => {
-    const [arrayRates, setArrayRates] = useRecoilState(arrayRateState)
-    const [usdRate, setUsdRate] = useRecoilState(usdRateState)
-    const [eurRate, setEurRate] = useRecoilState(eurRateState)
+
+    // const [arrayRates, setArrayRates] = useRecoilState(arrayRateState)
+    const [currencyArray, setCurrencyArray] = useRecoilState(currencyArrayState)
+    // const [usdRate, setUsdRate] = useRecoilState(usdRateState)
+    // const [eurRate, setEurRate] = useRecoilState(eurRateState)
 
     async function fetchRate() {
         await axios.get('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json')
             .then((responce) => {
-                currencyRates(responce.data);
-                console.log(responce.data)
+                currency(responce.data);
+                // console.log(responce.data)
             })
-            .catch((error) => {
+            .catch((error) => {                      // Обробити помилку
                 console.error(error.toJSON().message)
             })
     }
 
-    const currencyRates = (array) => {
+    const currency = (array) => {
         const arr = [];
-        array.map(elem => {
-            switch (elem.cc) {
-                case 'USD':
-                    arr.push(elem);
-                    setUsdRate(elem.rate)
-                    break;
-
-                case 'EUR':
-                    arr.push(elem);
-                    setEurRate(elem.rate)
-                    break;
+        array.map((elem) => {
+            if( initialCurrencyArray.some(el => el === elem.cc) ) {
+                arr.push(elem)
             }
         })
-        setArrayRates(arr);
+        setCurrencyArray(arr);
     }
 
     useEffect(() => {
@@ -47,7 +42,7 @@ const Header = () => {
     return (
         <Navbar bg="primary" variant="dark">
             <Container className='justify-content-around'>
-                { arrayRates.map((currency, index) => 
+                { currencyArray.map((currency, index) => 
                 <Scoreboard key={index} cc={currency.cc}>{currency.rate}</Scoreboard> //Перейменувати сс
                 )}
             </Container>

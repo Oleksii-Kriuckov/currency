@@ -2,34 +2,47 @@ import React, { useState } from 'react'
 import { Form } from 'react-bootstrap'
 import { useRecoilState } from 'recoil';
 import { usdRateState, eurRateState } from '../Atoms/atomCurrency';
-import { arrayRateState } from '../Atoms/AtomArrayCurrency';
+import { currencyArrayState } from '../Atoms/AtomArrayCurrency';
 import Select from './UI/Select.jsx';
 
 
 const Main = () => {
     const [amountFirst, setAmountFirst] = useState('')
     const [amountSecond, setAmountSecond] = useState('')
-    const [selectedCurencyFirst, setSelectedCurencyFirst] = useState('')
-    const [selectedCurencySecond, setSelectedCurencySecond] = useState('')
+    const [currencyFirst, setCurrencyFirst] = useState('')
+    const [currencySecond, setCurrencySecond] = useState('')
 
     const [usdRate, setUsdRate] = useRecoilState(usdRateState)
     const [eurRate, setEurRate] = useRecoilState(eurRateState)
-    const [arrayRates, setArrayRates] = useRecoilState(arrayRateState)
+    const [currencyArray, setCurrencyArray] = useRecoilState(currencyArrayState)
+    // const [arrayRates, setArrayRates] = useRecoilState(arrayRateState)
 
     const selectCurrencyFirst = (currency) => {
-        setSelectedCurencyFirst(currency);
-        // console.log("first value = " + amountFirst + ' ' + currency)
-        arrayRates.map(elem => {
-            if (elem.cc === currency) {
-                // if(elem.)
-                return setAmountSecond()
+        setCurrencyFirst(currency);
+        // console.log(currencyArray)
+        console.log("first value = " + amountFirst + ' ' + currency)
+        currencyArray.map(elem => {
+            if (elem.cc === currency && currencySecond === "UAH") {
+                return setAmountSecond(amountFirst*elem.rate)
+            } 
+            if (currency === "UAH" && elem.cc === currencySecond) {
+                return setAmountSecond(amountFirst/elem.rate)
             }
         })
-
+            
     }
     const selectCurrencySecond = (currency) => {
-        setSelectedCurencyFirst(currency);
+        setCurrencySecond(currency);
+        // console.log(currencyArray);
         console.log("second value = " + amountSecond + ' ' + currency)
+        currencyArray.map(elem => {
+            if (elem.cc === currency && currencyFirst === "UAH") {
+                return setAmountFirst(amountSecond*elem.rate)
+            } 
+            if (currency === "UAH" && elem.cc === currencyFirst) {
+                return setAmountFirst(amountSecond/elem.rate)
+            }
+        })
     }
 
     return (
@@ -42,10 +55,11 @@ const Main = () => {
                         className='me-3'
                         id='input' type="text"
                         placeholder='amount'
+                        onBlur={selectCurrencyFirst}
                     />
                     <Select 
                     defaultvalue='currency'
-                    value={selectedCurencyFirst}
+                    value={currencyFirst}
                     onChange={selectCurrencyFirst}
                     />
                 </Form.Group>
@@ -57,10 +71,11 @@ const Main = () => {
                         className='me-3'
                         id='input' type="text"
                         placeholder='amount'
+                        onBlur={selectCurrencySecond}
                     />
                     <Select 
                     defaultvalue='currency'
-                    value={selectedCurencySecond}
+                    value={currencySecond}
                     onChange={selectCurrencySecond}
                     />
                 </Form.Group>
