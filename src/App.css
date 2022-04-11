@@ -1,0 +1,19 @@
+.App {
+  text-align: center;
+}
+
+#input {
+  width: 120px;
+  height: fit-content;
+}
+
+ #select {
+   width: fit-content;
+ }
+
+.rate {
+  color: #eee;
+  background-color: #000;
+  padding: 1px 10px;
+  border-radius: 5px;
+}
