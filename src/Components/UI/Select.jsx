@@ -15,9 +15,9 @@ const Select = ({ defaultvalue, value, onChange }) => {
         >
             <option disabled defaultValue value=''>{defaultvalue}</option>
             {currencyArray.map((currency, index) =>
-                <option key={index} value={currency.cc}>{currency.cc}</option>
+                <option key={index} value={currency.rate}>{currency.cc}</option>
             )}
-            <option value="UAH">UAH</option>
+            <option value={1}>UAH</option>
         </Form.Select>
     )
 }

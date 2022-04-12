@@ -1,13 +1,7 @@
 import './App.css';
 import Header from './Components/Header';
 import Main from './Components/Main';
-import {
-  RecoilRoot,
-  atom,
-  selector,
-  useRecoilState,
-  useRecoilValue,
-} from 'recoil';
+import { RecoilRoot } from 'recoil';
 
 function App() {
   return (

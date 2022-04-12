@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 import { Form } from 'react-bootstrap'
 import { useRecoilState } from 'recoil';
-import { usdRateState, eurRateState } from '../Atoms/atomCurrency';
-import { currencyArrayState } from '../Atoms/AtomArrayCurrency';
-import Select from './UI/Select.jsx';
-
+import { isErrorState, errorMsgState } from '../Atoms/atomError';
+import { convert } from '../const';
+import FormGroup from './FormGroup';
 
 const Main = () => {
     const [amountFirst, setAmountFirst] = useState('')
@@ -12,74 +11,100 @@ const Main = () => {
     const [currencyFirst, setCurrencyFirst] = useState('')
     const [currencySecond, setCurrencySecond] = useState('')
 
-    const [usdRate, setUsdRate] = useRecoilState(usdRateState)
-    const [eurRate, setEurRate] = useRecoilState(eurRateState)
-    const [currencyArray, setCurrencyArray] = useRecoilState(currencyArrayState)
-    // const [arrayRates, setArrayRates] = useRecoilState(arrayRateState)
+    const [isError, setIsError] = useRecoilState(isErrorState)
+    const [errorMsg, setErrorMsg] = useRecoilState(errorMsgState)
+
+    const [isValid, setIsValid] = useState(false)
+    const [validation, setValidation] = useState(false)
+
+    const validationAmount = (value) => {
+        setValidation(true)
+        setIsValid(false)
+        const pattern = /\d+(.\d{1,2})?/ 
+        if (value.search(pattern) !== -1) {
+            setIsValid(true)
+            setValidation(false)
+        }
+    }
+
+    const changeAmountFirst = () => {
+        validationAmount(amountFirst)
+        if (!isValid) {
+            return setAmountSecond('')
+        }
+        if (currencyFirst !== '' && currencySecond !== '') {
+            return setAmountSecond(convert(amountFirst, currencyFirst, currencySecond).toFixed(2))
+        }
+    }
+    const changeAmountSecond = () => {
+        validationAmount(amountSecond)
+        if (!isValid) {
+            return setAmountFirst('')
+        }
+        if (currencyFirst !== '' && currencySecond !== '') {
+            return setAmountFirst(convert(amountSecond, currencySecond, currencyFirst).toFixed(2))
+        }
+    }
 
     const selectCurrencyFirst = (currency) => {
         setCurrencyFirst(currency);
-        // console.log(currencyArray)
-        console.log("first value = " + amountFirst + ' ' + currency)
-        currencyArray.map(elem => {
-            if (elem.cc === currency && currencySecond === "UAH") {
-                return setAmountSecond(amountFirst*elem.rate)
-            } 
-            if (currency === "UAH" && elem.cc === currencySecond) {
-                return setAmountSecond(amountFirst/elem.rate)
+        if (amountSecond !== '' && currencySecond !== '') {
+            return setAmountFirst(convert(amountSecond, currencySecond, currency).toFixed(2))
+        }
+        if (amountFirst !== '' && currencySecond !== '') {
+            if (!isValid) {
+                return setAmountSecond('')
             }
-        })
-            
+            return setAmountSecond(convert(amountFirst, currency, currencySecond).toFixed(2))
+        }
     }
+
     const selectCurrencySecond = (currency) => {
         setCurrencySecond(currency);
-        // console.log(currencyArray);
-        console.log("second value = " + amountSecond + ' ' + currency)
-        currencyArray.map(elem => {
-            if (elem.cc === currency && currencyFirst === "UAH") {
-                return setAmountFirst(amountSecond*elem.rate)
-            } 
-            if (currency === "UAH" && elem.cc === currencyFirst) {
-                return setAmountFirst(amountSecond/elem.rate)
+        if (amountFirst !== '' && currencyFirst !== '') {
+            if (!isValid) {
+                return setAmountSecond('')
             }
-        })
+            return setAmountSecond(convert(amountFirst, currencyFirst, currency).toFixed(2))
+        }
+        if (amountSecond !== '' && currencyFirst !== '') {
+            if (!isValid) {
+                return setAmountFirst('')
+            }
+            return setAmountFirst(convert(amountSecond, currency, currencyFirst).toFixed(2))
+        }
     }
 
     return (
         <div>
-            <Form className='d-flex justify-content-center mt-5'>
-                <Form.Group className="mb-3 d-flex me-5" >
-                    <Form.Control
-                        value={amountFirst}
-                        onChange={(e) => setAmountFirst(e.target.value)}
-                        className='me-3'
-                        id='input' type="text"
-                        placeholder='amount'
-                        onBlur={selectCurrencyFirst}
-                    />
-                    <Select 
-                    defaultvalue='currency'
-                    value={currencyFirst}
-                    onChange={selectCurrencyFirst}
-                    />
-                </Form.Group>
-
-                <Form.Group className="mb-3 d-flex " >
-                    <Form.Control
-                        value={amountSecond}
-                        onChange={(e) => setAmountSecond(e.target.value)}
-                        className='me-3'
-                        id='input' type="text"
-                        placeholder='amount'
-                        onBlur={selectCurrencySecond}
-                    />
-                    <Select 
-                    defaultvalue='currency'
-                    value={currencySecond}
-                    onChange={selectCurrencySecond}
-                    />
-                </Form.Group>
-            </Form>
+            {!isError ?
+                <>
+                    <Form className='d-flex justify-content-center mt-5'>
+                        <FormGroup
+                            valueControl={amountFirst}
+                            valueSelect={currencyFirst}
+                            onChangeControl={(e) => setAmountFirst(e.target.value)}
+                            onChangeSelect={selectCurrencyFirst}
+                            onFocus={() => setAmountSecond('')}
+                            onBlur={changeAmountFirst}
+                        />
+                        <FormGroup
+                            valueControl={amountSecond}
+                            valueSelect={currencySecond}
+                            onChangeControl={(e) => setAmountSecond(e.target.value)}
+                            onChangeSelect={selectCurrencySecond}
+                            onFocus={() => setAmountFirst('')}
+                            onBlur={changeAmountSecond}
+                        />
+                    </Form>
+                    {(!isValid && validation) ?
+                        <h3 style={{ color: "red" }}>
+                            An input field must contain a positive number and any non-numeric characters exept for dot
+                        </h3>
+                        : null}
+                </>
+                : <h1 className='mt-5'>{errorMsg}</h1>
+            }
         </div>
     )
 }
